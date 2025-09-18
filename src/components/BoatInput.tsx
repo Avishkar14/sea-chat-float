@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Send, Anchor } from "lucide-react";
 import { cn } from "@/lib/utils";
-import boatSilhouette from "@/assets/boat-silhouette.png";
 
 interface BoatInputProps {
   onSendMessage: (message: string) => void;
@@ -60,15 +59,6 @@ export const BoatInput = ({ onSendMessage, disabled = false }: BoatInputProps) =
 
   return (
     <div className="relative">
-      {/* Floating black boat in background */}
-      <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 z-0">
-        <img 
-          src={boatSilhouette} 
-          alt="Floating boat" 
-          className="w-24 h-24 opacity-30 animate-bob"
-        />
-      </div>
-      
       {/* Water ripples */}
       {ripples?.map(ripple => (
         <div
@@ -83,26 +73,48 @@ export const BoatInput = ({ onSendMessage, disabled = false }: BoatInputProps) =
         />
       ))}
       
-      {/* Golden boat hull input container */}
+      {/* Boat with transparent input container */}
       <div
         ref={boatRef}
-        className="relative p-6 mx-4 mb-8 z-10"
+        className="relative mx-4 mb-8"
         style={{
-          minHeight: '80px',
           maxWidth: '600px',
-          margin: '0 auto 2rem auto',
-          background: 'linear-gradient(135deg, #D4A574 0%, #B8956A 50%, #D4A574 100%)',
-          borderRadius: '50px 50px 30px 30px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 2px 8px rgba(255, 255, 255, 0.2)'
+          margin: '0 auto 2rem auto'
         }}
       >
-        {/* Boat mast indicator */}
-        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 flex items-center">
-          <Anchor className="w-5 h-5 text-accent animate-gentle-wave" />
+        {/* Boat background visual */}
+        <div className="boat-visual absolute inset-0 z-0">
+          {/* Boat mast */}
+          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 flex items-center z-10">
+            <Anchor className="w-5 h-5 text-accent animate-gentle-wave" />
+          </div>
+          
+          {/* Boat hull SVG */}
+          <svg 
+            viewBox="0 0 400 100" 
+            className="w-full h-20 absolute top-0"
+            style={{ filter: 'drop-shadow(var(--boat-glow))' }}
+          >
+            <path
+              d="M50 80 Q200 60 350 80 Q350 90 200 95 Q50 90 50 80 Z"
+              fill="url(#boatGradient)"
+              className="animate-bob"
+            />
+            <defs>
+              <linearGradient id="boatGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="hsl(var(--boat))" />
+                <stop offset="100%" stopColor="hsl(var(--boat-shadow))" />
+              </linearGradient>
+            </defs>
+            
+            {/* Boat details */}
+            <circle cx="120" cy="85" r="3" fill="hsl(var(--boat-shadow))" opacity="0.8" />
+            <circle cx="280" cy="85" r="3" fill="hsl(var(--boat-shadow))" opacity="0.8" />
+          </svg>
         </div>
         
-        {/* Input form */}
-        <form onSubmit={handleSubmit} className="flex items-end gap-3">
+        {/* Transparent input form overlay */}
+        <form onSubmit={handleSubmit} className="relative z-10 flex items-center gap-3 p-6 pt-8">
           <div className="flex-1">
             <textarea
               ref={textareaRef}
@@ -114,9 +126,9 @@ export const BoatInput = ({ onSendMessage, disabled = false }: BoatInputProps) =
               rows={1}
               className={cn(
                 "w-full resize-none rounded-2xl px-4 py-3",
-                "bg-transparent text-gray-800 placeholder-gray-600",
-                "border-none outline-none",
-                "scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
+                "bg-transparent text-foreground placeholder-foreground/60",
+                "border-none outline-none backdrop-blur-sm",
+                "scrollbar-thin scrollbar-thumb-accent/20 scrollbar-track-transparent"
               )}
               style={{ maxHeight: '120px' }}
             />
@@ -127,7 +139,7 @@ export const BoatInput = ({ onSendMessage, disabled = false }: BoatInputProps) =
             size="lg"
             disabled={!message.trim() || disabled}
             className={cn(
-              "rounded-full h-12 w-12 p-0",
+              "rounded-full h-12 w-12 p-0 z-20 relative",
               "bg-primary hover:bg-primary/90 text-primary-foreground",
               "shadow-lg hover:shadow-xl transition-all duration-200",
               "disabled:opacity-50 disabled:hover:bg-primary"
@@ -136,11 +148,6 @@ export const BoatInput = ({ onSendMessage, disabled = false }: BoatInputProps) =
             <Send className="w-5 h-5" />
           </Button>
         </form>
-        
-        {/* Golden boat hull details */}
-        <div className="absolute -bottom-3 left-6 w-4 h-6 bg-amber-700 rounded-full opacity-60" />
-        <div className="absolute -bottom-3 right-6 w-4 h-6 bg-amber-700 rounded-full opacity-60" />
-        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-3 bg-amber-800 rounded-full opacity-40" />
       </div>
     </div>
   );
